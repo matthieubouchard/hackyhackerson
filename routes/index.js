@@ -66,26 +66,34 @@ router.get("/tweeter/:name", async function(req, res, next) {
 });
 
 router.get('/:name/', async function (req, res, next) {
-  if(req.query.length >= 15){
-    let phrase = req.query.phrase.substring(0, 15)
+  console.log(req.query)
+  console.log(req.query.length);
+  if(req.query.phrase.length >= 15){
+    let phrase = req.query.phrase
+    if(phrase.length > 15){
+       phrase = phrase.substring(0, 15)
+    }
     const candidate = req.params.name;
 
     const candidateConsts = constants[candidate];
     const encodedArray = oneHotEncode(phrase, candidateConsts);
     console.log(encodedArray);
-    const phraseLength = phrase.length;
     const encoderLength = Object.keys(candidateConsts.char_indices).length
-
+    const model = await candidateModels[candidate];
     while(encodedArray.length < 140){
-      const tfEncodedArray = tf.tensor(encodedArray.slice(encodedArray.length -15, encodedArray.length), [1, phraseLength, encoderLength])
+      console.log(encodedArray.length);
+      const slicedArray = encodedArray.slice(encodedArray.length - 15, encodedArray.length);
+      console.log('here is the sliced array');
+      console.log(slicedArray);
+      const tfEncodedArray = tf.tensor([slicedArray])
       const prediction = model.predict(tfEncodedArray)
       const arrayIndex = sample(prediction, .5);
       const letterArray = new Array(Object.keys(candidateConsts.char_indices).length).fill(0);
       letterArray[arrayIndex] = 1;
-      encodedArray.push(sample(prediction, .5));
-    }
+      encodedArray.push(letterArray);
+    };
     // const tfEncodedArray = tf.tensor(encodedArray, [1, phraseLength, encoderLength])
-    // const model = await candidateModels[candidate];
+
     // const prediction = model.predict(tfEncodedArray)
     const decodedArray = oneHotDecode(encodedArray, candidateConsts)
     res.json(decodedArray);
@@ -122,6 +130,7 @@ const sample = (probs, temperature) => {
     // We randomly draw a sample from the distribution.
     return tf.multinomial(logits, 1, null, isNormalized).dataSync()[0];
   });
+}
 
 
 module.exports = router;
