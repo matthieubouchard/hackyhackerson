@@ -4,10 +4,9 @@ var fs = require("fs");
 var axios = require("axios");
 
 function saveJsonFile(fileName, data) {
-  const path =
-    "/Users/matthewbouchard/hackathon/tweety/routes/hack_data/BernieSanders.json";
-  fs.appendFile(
-    `/Users/matthewbouchard/hackathon/tweety/routes/hack_data/BernieSanders.json`,
+  
+  fs.writeFile(
+    `./${fileName}.json`,
     JSON.stringify(data),
     (err, success) => {
       console.log("error?", err);
@@ -18,7 +17,7 @@ function saveJsonFile(fileName, data) {
 
 /* GET home page. */
 router.get("/", function(req, res, next) {
-  res.render("index", { title: "Express" });
+  res.json({success: true})
 });
 
 router.get("/tweeter/:name", async function(req, res, next) {
@@ -38,7 +37,7 @@ router.get("/tweeter/:name", async function(req, res, next) {
       url: url,
       headers: {
         Authorization:
-          "Bearer "
+          "Bearer AAAAAAAAAAAAAAAAAAAAAP0NCwEAAAAA9p3kxawPM9tZ0eRrpBi9ZcU%2F%2Bms%3Dm7w89YTtB2r1J7RCFNvy2DU1kh9O1LR2wTReMARNGxjsWvb1Rg"
       }
     });
 
@@ -56,6 +55,8 @@ router.get("/tweeter/:name", async function(req, res, next) {
   for (let i = 0; (i <= 10); i++) {
     await getTweets(lastFlag);
   }
+
+  console.log('LENTHSSSS', result.length)
 
   res.json(result);
   saveJsonFile(req.params.name, result);
