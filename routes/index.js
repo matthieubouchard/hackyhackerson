@@ -87,7 +87,7 @@ router.get('/:name/', async function (req, res, next) {
       console.log(slicedArray);
       const tfEncodedArray = tf.tensor([slicedArray])
       const prediction = model.predict(tfEncodedArray)
-      const arrayIndex = sample(prediction, .5);
+      const arrayIndex = sample(prediction, .1);
       const letterArray = new Array(Object.keys(candidateConsts.char_indices).length).fill(0);
       letterArray[arrayIndex] = 1;
       encodedArray.push(letterArray);
